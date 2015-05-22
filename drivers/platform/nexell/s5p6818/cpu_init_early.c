@@ -42,7 +42,7 @@ static void cpu_early_setup_gpio(void __iomem *base,
 				(mod == PAD_GET_MODE(PAD_MODE_OUT) ? CTRUE : CFALSE));
 		NX_GPIO_SetOutputValue(index, pin,  (lv ? CTRUE : CFALSE));
 		NX_GPIO_SetInterruptMode(index, pin, lv);
-		NX_GPIO_SetPullEnable(index, pin, (NX_GPIO_PADPULL)plup);
+		NX_GPIO_SetPullEnable(index, pin, (NX_GPIO_PULL)plup);
 		NX_GPIO_SetDriveStrength(index, pin, (NX_GPIO_DRVSTRENGTH)str); /* pad strength */
 
 		pr_debug("[Gpio %d.%2d: DIR %s, ALT %d, Level %s, Pull %s, Str %d]\n",
