@@ -10,9 +10,7 @@ config ARM64
 	select ARCH_WANT_COMPAT_IPC_PARSE_VERSION
 	select ARCH_WANT_FRAME_POINTERS
 	select ARM_AMBA
-	select ARM_ARCH_TIMER
 	select ARM_GIC
-	select ARM_GIC_V3
 	select BUILDTIME_EXTABLE_SORT
 	select AUDIT_ARCH_COMPAT_GENERIC
 	select CLONE_BACKWARDS
@@ -147,6 +145,25 @@ config ARCH_XGENE
 	bool "AppliedMicro X-Gene SOC Family"
 	help
 	  This enables support for AppliedMicro X-Gene SOC Family
+
+config SCHED_HRTICK
+	def_bool HIGH_RES_TIMERS
+
+config ARCH_S5P6818
+	bool "SLsiAP S5P6818"
+	select PLAT_SLSIAP
+	select ARCH_REQUIRE_GPIOLIB
+	select CLKSRC_NXP_TIMER
+	help
+	  This enables support for the ARMv8 software model (Versatile
+	  Express).
+
+config PLAT_SLSIAP
+	bool
+
+if PLAT_SLSIAP
+source "kernel/Kconfig.hz"
+endif
 
 endmenu
 
@@ -403,7 +420,7 @@ config ARMV7_COMPAT_CPUINFO
 source "mm/Kconfig"
 
 config FORCE_MAX_ZONEORDER
-	int
+	int "Memory Max Zone Oreder (11:4MB, 12:8MB 13:16MB)"
 	default "14" if (ARM64_64K_PAGES && TRANSPARENT_HUGEPAGE)
 	default "11"
 

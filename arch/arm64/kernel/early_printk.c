@@ -74,6 +74,29 @@ static void uart8250_32bit_printch(char ch)
 	writel_relaxed(ch, early_base + (UART_TX << 2));
 }
 
+#ifdef CONFIG_ARCH_S5P6818
+#define ULCON       0x00
+#define UFCON       0x08
+#define UTRSTAT     0x10
+#define UTXH        0x20
+#define URXH        0x24
+#define UBRDIV    	0x28
+#define DIVSLOT    	0x2C
+
+#define FIFO_ENABLED    (1<<0)
+#define UTRSTAT_TXFE    (1<<1)
+#define UTRSTAT_RXDR    (1<<0)
+
+static void s3c24xx_printch(char ch)
+{
+    while (!(readl_relaxed(early_base + UFCON) & FIFO_ENABLED))
+        ;
+    writeb_relaxed(ch, early_base + UTXH);
+    while (!(readl_relaxed(early_base + UTRSTAT) & UTRSTAT_TXFE))
+        ;
+}
+#endif
+
 struct earlycon_match {
 	const char *name;
 	void (*printch)(char ch);
@@ -84,6 +107,7 @@ static const struct earlycon_match earlycon_match[] __initconst = {
 	{ .name = "smh", .printch = smh_printch, },
 	{ .name = "uart8250-8bit", .printch = uart8250_8bit_printch, },
 	{ .name = "uart8250-32bit", .printch = uart8250_32bit_printch, },
+	{ .name = "nxp-s3c", .printch = s3c24xx_printch, },
 	{}
 };
 

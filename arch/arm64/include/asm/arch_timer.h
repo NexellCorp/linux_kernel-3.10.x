@@ -135,6 +135,7 @@ static inline void arch_timer_evtstrm_enable(int divider)
 #endif
 }
 
+#ifdef CONFIG_ARM_ARCH_TIMER
 static inline u64 arch_counter_get_cntvct(void)
 {
 	u64 cval;
@@ -149,5 +150,9 @@ static inline int arch_timer_arch_init(void)
 {
 	return 0;
 }
+#else
+extern u64 arch_counter_get_cntvct(void);
+extern int arch_timer_arch_init(void);
+#endif
 
 #endif

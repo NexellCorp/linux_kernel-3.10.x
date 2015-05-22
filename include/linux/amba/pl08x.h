@@ -89,8 +89,8 @@ struct pl08x_platform_data {
 	const struct pl08x_channel_data *slave_channels;
 	unsigned int num_slave_channels;
 	struct pl08x_channel_data memcpy_channel;
-	int (*get_signal)(const struct pl08x_channel_data *);
-	void (*put_signal)(const struct pl08x_channel_data *, int);
+	int (*get_dma_signal)(const struct pl08x_channel_data *);
+	void (*put_dma_signal)(const struct pl08x_channel_data *, int);
 	u8 lli_buses;
 	u8 mem_buses;
 };

@@ -1,0 +1,256 @@
+/*
+ * s5p6818.dtsi - Device Tree Include file for SLsiAp SoC
+ *
+ * Copyright 2009 Nexell Co.
+ *		http://www.nexell.co.kr
+ *
+ * Licensed under GPLv2 or later.
+ */
+
+#include "s5p6818.dtsi"
+
+#define	UART_CLOCK_FREQUENCY	147500000
+#define I2C_CLOCK_FREQUENCY		100000000
+#define SPI_CLOCK_FREQUENCY		100000000
+
+/ {
+	memory {
+		reg = <0x40000000 0x40000000>;
+	};
+
+    aliases {
+		snd_null_card0 = &snd_null_card_0;
+		snd_null_card2 = &snd_null_card_2;
+	};
+
+	soc {
+
+		clocks {
+			uart0:uart@a9000 { clock-frequency = <UART_CLOCK_FREQUENCY>; };
+			uart1:uart@a8000 { clock-frequency = <UART_CLOCK_FREQUENCY>; };
+			uart2:uart@aa000 { clock-frequency = <UART_CLOCK_FREQUENCY>; };
+			uart3:uart@ab000 { clock-frequency = <UART_CLOCK_FREQUENCY>; };
+			uart4:uart@6e000 { clock-frequency = <UART_CLOCK_FREQUENCY>; };
+			uart5:uart@84000 { clock-frequency = <UART_CLOCK_FREQUENCY>; };
+			i2c0:i2c@ae000 { clock-frequency = <I2C_CLOCK_FREQUENCY>; };
+			i2c1:i2c@af000 { clock-frequency = <I2C_CLOCK_FREQUENCY>; };
+			i2c2:i2c@b0000 { clock-frequency = <I2C_CLOCK_FREQUENCY>; };
+			spi0:spi@ac000 { clock-frequency = <SPI_CLOCK_FREQUENCY>; };
+			spi1:spi@ad000 { clock-frequency = <SPI_CLOCK_FREQUENCY>; };
+			spi2:spi@a7000 { clock-frequency = <SPI_CLOCK_FREQUENCY>; };
+		};
+
+		#include "s5p6818-svt-pin.dtsi"
+
+		serial@a1000 {
+			enable_dma = <1>;
+		};
+
+		serial@a0000 {
+			enable_dma = <1>;
+		};
+
+		spi@5b000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			num_cs = <1>;
+			clk_nr = <0>;
+
+
+			spidev@0 {
+				compatible = "spidev";
+				reg = <0>;
+				spi-max-frequency = < 50000000 >;
+				controller-data {
+				  spi-cs-gpio = <10>;
+					spi-feedback-delay = <02>;
+				};
+			};
+		};
+		spi@5c000 {
+			num_cs = <1>;
+			clk_nr = <0>;
+		};
+		spi@5f000 {
+			num_cs = <1>;
+			clk_nr = <0>;
+		};
+
+		rtc@10c00 {
+			status = "okay";
+		};
+
+		wdt@19000 {
+			status = "okay";
+		};
+
+		ppm@54000 {
+			status = "okay";
+		};
+
+		framebuffer@0 {
+			status = "okay";
+			module = <0>;
+			frame_layer = <0>;
+			frame_format = <MLC_RGBFMT_A8R8G8B8>;
+			back_color = <0x0>;
+			bit_per_pixel	= <(4 * 8)>;
+			lcd_x_resol	= <1024>;
+			lcd_y_resol	= <600>;
+			#ifdef CONFIG_ANDROID
+			frame_buffers = <3>;
+			skip_pan_vsync = <1>;
+			#else
+			frame_buffers = <2>;
+			#endif
+			lcd_with_mm	= <155>;
+			lcd_height_mm = <90>;
+		};
+
+		lvds@0 {
+			status = "okay";
+			lvds_format = <LVDS_LCDFORMAT_JEIDA>; /* 0:VESA, 1:JEIDA, 2:Location */
+			vsync {
+				hor_active_size	= <1024>;
+				hor_sync_width	= <20>;
+				hor_back_porch	= <140>;
+				hor_front_porch	= <160>;
+				hor_sync_invert	= <1>;
+				ver_active_size	= <600>;
+				ver_sync_width	= <3>;
+				ver_back_porch	= <20>;
+				ver_front_porch	= <12>;
+				ver_sync_invert	= <1>;
+				pixel_clock_hz	= <(800000000/12)>;	/* PLL/div */
+			};
+			clock {
+				clock,src_div0  = <2>;
+				clock,div_val0	= <12>;
+				clock,src_div1	= <7>;
+				clock,div_val1	= <1>;
+			};
+		};
+
+		pdm@14000 {
+			status = "okay";
+		};
+
+		i2s_0:i2s0@55000 {
+			master_mode = <1>;
+			mclk_in = <0>;
+			trans_mode = <1>;
+			frame_bit = <48>;
+			sample_rate = <48000>;
+			pre_supply_mclk = <1>;
+			status = "okay";
+		};
+		i2s_1:i2s1@56000 {
+			master_mode = <1>;
+			mclk_in = <1>;
+			trans_mode = <0>;
+			frame_bit = <48>;
+			sample_rate = <48000>;
+			pre_supply_mclk = <0>;
+			status = "okay";
+		};
+
+		i2s_2:i2s2@57000 {
+			master_mode = <0>;
+			mclk_in = <1>;
+			trans_mode = <1>;
+			frame_bit = <48>;
+			sample_rate = <48000>;
+			pre_supply_mclk = <0>;
+			status = "okay";
+		};
+
+        iic0:iic@a4000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			rt5631: rt5631@1a {
+				compatible = "rt,rt5631";
+				reg = <0x1a>;
+			};
+	    };
+
+        spdiftx@59000 {
+			status = "okay";
+		};
+
+		spdifrx@5a000 {
+			status = "okay";
+		};
+	};
+
+	pdm-dir {
+		compatible = "nexell,pdm-dir";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0 0>;
+	};
+
+	pdm_recorder {
+		compatible = "nexell,pdm-recorder";
+		sample_rate = <48000>;
+        format = "S16";
+	};
+
+	snd-null {
+		compatible = "nexell,snd-null";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0 0>;
+	};
+
+	snd_null_card_0:snd_null_card@0 {
+		compatible = "nexell,snd-null-card";
+		ch = <0>;
+		sample_rate = <48000>;
+	    format = "S16";
+		nexell,i2s-controller = <&i2s_0>;
+	};
+
+	sound {
+		compatible = "nexell,nxp-rt5631";
+		ch = <1>;
+		sample_rate = <48000>;
+	    format = "S16";
+		nexell,i2s-controller = <&i2s_1>;
+		nexell,audio-codec = <&rt5631>;
+	};
+
+	snd_null_card_2:snd_null_card@2 {
+		compatible = "nexell,snd-null-card";
+		ch = <2>;
+		sample_rate = <48000>;
+	    format = "S16";
+		nexell,i2s-controller = <&i2s_2>;
+	};
+
+	spdif-dit {
+		compatible = "nexell,spdif-dit";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0 0>;
+	};
+
+	spdif-transciever {
+		compatible = "nexell,spdif-transciever";
+		sample_rate = <48000>;
+	    format = "S16";
+	};
+
+	spdif-dir {
+		compatible = "nexell,spdif-dir";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0 0>;
+	};
+
+	spdif-receiver {
+		compatible = "nexell,spdif-receiver";
+		sample_rate = <48000>;
+	    format = "S16";
+	};
+};

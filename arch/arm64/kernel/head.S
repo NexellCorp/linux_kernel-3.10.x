@@ -477,7 +477,11 @@ ENDPROC(__turn_mmu_on)
 /*
  * Calculate the start of physical memory.
  */
+#ifdef CONFIG_ARCH_S5P6818
+ENTRY(__calc_phys_offset)
+#else
 __calc_phys_offset:
+#endif
 	adr	x0, 1f
 	ldp	x1, x2, [x0]
 	sub	x28, x0, x1			// x28 = PHYS_OFFSET - PAGE_OFFSET
