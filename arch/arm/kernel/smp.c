@@ -521,7 +521,11 @@ static void __cpuinit broadcast_timer_setup(struct clock_event_device *evt)
 	evt->features	= CLOCK_EVT_FEAT_ONESHOT |
 			  CLOCK_EVT_FEAT_PERIODIC |
 			  CLOCK_EVT_FEAT_DUMMY;
+#ifdef CONFIG_ARCH_S5P6818
+	evt->rating	= 400;
+#else
 	evt->rating	= 100;
+#endif
 	evt->mult	= 1;
 	evt->set_mode	= broadcast_timer_set_mode;
 

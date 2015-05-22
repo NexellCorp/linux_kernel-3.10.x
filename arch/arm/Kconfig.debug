@@ -540,6 +540,14 @@ choice
 		  For more details about semihosting, please see
 		  chapter 8 of DUI0203I_rvct_developer_guide.pdf from ARM Ltd.
 
+	config DEBUG_NXP_UART
+		depends on PLAT_SLSIAP
+		bool "Kernel low-level debugging SLsiAP UART"
+		help
+		  Say Y here if you want the debug print routines to direct
+		  their output to DEBUG UARTn. The port must have been initialised
+		  by the boot-loader before use.
+
 endchoice
 
 config DEBUG_EXYNOS_UART

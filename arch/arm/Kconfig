@@ -866,6 +866,29 @@ config ARCH_OMAP1
 	help
 	  Support for older TI OMAP1 (omap7xx, omap15xx or omap16xx)
 
+config ARCH_S5P6818
+	bool "SLsiAP S5P6818"
+	select PLAT_SLSIAP
+	select IRQ_DOMAIN
+	select MULTI_IRQ_HANDLER
+	select SPARSE_IRQ
+	select CPU_V7
+	select ARM_AMBA
+	select ARM_GIC
+	select GENERIC_CLOCKEVENTS
+	select COMMON_CLK
+	select HAVE_SMP
+	select HAVE_CLK
+	select ARCH_HAS_CPUFREQ
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select NEED_MACH_MEMORY_H
+	select NEED_MACH_IO_H
+	select NEED_MACH_GPIO_H
+	select PINCTRL
+	help
+	  Support for SLsiAP s5p6818 octa core (ARM Cortex A53) platform
+	  compatible with ARMv7
+
 endchoice
 
 menu "Multiple platform selection"
@@ -1030,6 +1053,8 @@ source "arch/arm/mach-w90x900/Kconfig"
 
 source "arch/arm/mach-zynq/Kconfig"
 
+source "arch/arm/mach-s5p6818/Kconfig"
+
 # Definitions to make life easier
 config ARCH_ACORN
 	bool
@@ -1054,6 +1079,13 @@ config PLAT_PXA
 
 config PLAT_VERSATILE
 	bool
+
+config PLAT_SLSIAP
+	bool
+
+if PLAT_SLSIAP
+source "kernel/Kconfig.hz"
+endif
 
 config ARM_TIMER_SP804
 	bool

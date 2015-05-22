@@ -65,6 +65,9 @@ static inline void dsb_sev(void)
  * release it, because V6 CPUs are assumed to have weakly ordered
  * memory.
  */
+#ifdef CONFIG_ARCH_S5P6818
+#define arch_spin_is_locked(x)		((x)->slock != 0)
+#endif
 
 #define arch_spin_unlock_wait(lock) \
 	do { while (arch_spin_is_locked(lock)) cpu_relax(); } while (0)
@@ -74,6 +77,18 @@ static inline void dsb_sev(void)
 static inline void arch_spin_lock(arch_spinlock_t *lock)
 {
 	unsigned long tmp;
+#ifdef CONFIG_ARCH_S5P6818
+	__asm__ __volatile__(
+"1:	ldrex	%0, [%1]\n"
+"	teq	%0, #0\n"
+	WFE("ne")
+"	strexeq	%0, %2, [%1]\n"
+"	teqeq	%0, #0\n"
+"	bne	1b"
+	: "=&r" (tmp)
+	: "r" (&lock->slock), "r" (1)
+	: "cc");
+#else
 	u32 newval;
 	arch_spinlock_t lockval;
 
@@ -91,12 +106,30 @@ static inline void arch_spin_lock(arch_spinlock_t *lock)
 		wfe();
 		lockval.tickets.owner = ACCESS_ONCE(lock->tickets.owner);
 	}
-
+#endif
 	smp_mb();
 }
 
 static inline int arch_spin_trylock(arch_spinlock_t *lock)
 {
+#ifdef CONFIG_ARCH_S5P6818
+	unsigned long tmp;
+
+	__asm__ __volatile__(
+"	ldrex	%0, [%1]\n"
+"	teq	%0, #0\n"
+"	strexeq	%0, %2, [%1]"
+	: "=&r" (tmp)
+	: "r" (&lock->slock), "r" (1)
+	: "cc");
+
+	if (tmp == 0) {
+		smp_mb();
+		return 1;
+	} else {
+		return 0;
+	}
+#else
 	unsigned long contended, res;
 	u32 slock;
 
@@ -118,15 +151,25 @@ static inline int arch_spin_trylock(arch_spinlock_t *lock)
 	} else {
 		return 0;
 	}
+#endif
 }
 
 static inline void arch_spin_unlock(arch_spinlock_t *lock)
 {
 	smp_mb();
+#ifdef CONFIG_ARCH_S5P6818
+	__asm__ __volatile__(
+"	str	%1, [%0]\n"
+	:
+	: "r" (&lock->slock), "r" (0)
+	: "cc");
+#else
 	lock->tickets.owner++;
+#endif
 	dsb_sev();
 }
 
+#ifndef CONFIG_ARCH_S5P6818
 static inline int arch_spin_is_locked(arch_spinlock_t *lock)
 {
 	struct __raw_tickets tickets = ACCESS_ONCE(lock->tickets);
@@ -139,6 +182,7 @@ static inline int arch_spin_is_contended(arch_spinlock_t *lock)
 	return (tickets.next - tickets.owner) > 1;
 }
 #define arch_spin_is_contended	arch_spin_is_contended
+#endif
 
 /*
  * RWLOCKS
